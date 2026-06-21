@@ -934,74 +934,142 @@ export default function PCBuilder() {
     setScreen('builder')
   }
 
-  const handleSaveSetup = async (selectedComponents: SelectedComponents, totalSpent: number) => {
+   const handleSaveSetup = async (selectedComponents: SelectedComponents, totalSpent: number) => {
+
     try {
+
       setError(null)
 
+
+
       // 1. Criamos a lista filtrando apenas os componentes que o usuário de fato selecionou
+
       const listaDeComponentes = [
+
         selectedComponents.cpu,
+
         selectedComponents.motherboard,
+
         selectedComponents.ram,
+
         selectedComponents.gpu,
+
         selectedComponents.psu
+
       ].filter((comp): comp is Component => comp !== null) // Remove os nulos caso algum passo tenha ficado em branco
 
+
+
       // 2. Mapeamos os objetos do front para o padrão em português aceito pela Entity/Banco do Java
+
       const componentesFormatados = listaDeComponentes.map(comp => ({
+
         id: Number(comp.id),
+
         nome: comp.name,
+
         preco: comp.price,
+
         marca: comp.brand,
-        tipo: comp.id.toLowerCase().includes('cpu') ? 'CPU' : 
+
+        tipo: comp.id.toLowerCase().includes('cpu') ? 'CPU' :
+
               comp.id.toLowerCase().includes('mb') ? 'MOTHERBOARD' :
+
               comp.id.toLowerCase().includes('ram') ? 'RAM' :
+
               comp.id.toLowerCase().includes('gpu') ? 'GPU' : 'PSU'
+
       }))
 
+
+
       // 3. Montamos o objeto exatamente como a classe Setup.java espera receber
+
       const dadosParaSalvar = {
+
         nome: `Setup Customizado - ${new Date().toLocaleDateString('pt-BR')}`,
+
         orcamentoMaximo: budget, // Atributo exato do Setup.java
+
         valorTotal: totalSpent,  // Atributo exato do Setup.java
+
         componentes: componentesFormatados // A lista única que a validação do Java exige!
+
       }
+
+
 
       console.log('JSON alinhado com o Backend Java:', JSON.stringify(dadosParaSalvar, null, 2))
 
+
+
       const response = await fetch('http://localhost:8080/api/setups', {
+
         method: 'POST',
+
         headers: {
+
           'Content-Type': 'application/json',
+
         },
+
         body: JSON.stringify(dadosParaSalvar),
+
       })
 
+
+
       if (!response.ok) {
+
         const errorData = await response.text()
+
         console.error('O servidor Java recusou com o erro:', errorData)
+
         throw new Error(errorData || 'O valor do setup excede o orçamento disponível!')
+
       }
+
+
 
       // Se deu bom, salva localmente e prossegue
+
       const setupData: SavedSetup = {
+
         selected: selectedComponents,
+
         budget,
+
         totalSpent,
+
         savedAt: new Date().toISOString()
+
       }
-      
+
+     
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(setupData))
+
       setLastSetup(setupData)
-      
+
+     
+
       return true
 
+
+
     } catch (err: any) {
+
       const errorMessage = err instanceof Error ? err.message : 'Erro ao salvar setup no servidor'
+
       setError(errorMessage)
+
       console.error('Erro detalhado no salvamento:', err)
+
       return false
+
     }
+
   }
 
   const handleViewLastSetup = () => {

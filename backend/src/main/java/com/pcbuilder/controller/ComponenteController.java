@@ -2,6 +2,7 @@ package com.pcbuilder.controller;
 
 import com.pcbuilder.model.Componente;
 import com.pcbuilder.repository.ComponenteRepository;
+import com.pcbuilder.model.ComponenteServiceProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,35 +16,42 @@ public class ComponenteController {
     @Autowired
     private ComponenteRepository componenteRepository;
 
+    @Autowired
+    private ComponenteServiceProxy componenteService;
+
     @GetMapping
     public List<Componente> getAllComponentes() {
-        return componenteRepository.findAll();
+        return componenteService.buscarTodos();
     }
 
     @GetMapping("/{id}")
     public Componente getComponenteById(@PathVariable Long id) {
-        return componenteRepository.findById(id).orElse(null);
+        return componenteService.buscarPorId(id);
     }
 
     @GetMapping("/tipo/{tipo}")
     public List<Componente> getComponentesByTipo(@PathVariable String tipo) {
-        return componenteRepository.findByTipo(tipo);
+        return componenteService.buscarPorTipo(tipo);
     }
 
     @PostMapping
     public Componente createComponente(@RequestBody Componente componente) {
-        return componenteRepository.save(componente);
+        Componente novo = componenteRepository.save(componente);
+        componenteService.limparCache(); // Agora o método existe e limpa o cache com sucesso!
+        return novo;
     }
 
     @PutMapping("/{id}")
     public Componente updateComponente(@PathVariable Long id, @RequestBody Componente componente) {
         componente.setId(id);
-        return componenteRepository.save(componente);
+        Componente atualizado = componenteRepository.save(componente);
+        componenteService.limparCache(); 
+        return atualizado;
     }
 
     @DeleteMapping("/{id}")
     public void deleteComponente(@PathVariable Long id) {
         componenteRepository.deleteById(id);
+        componenteService.limparCache(); 
     }
-
 }
