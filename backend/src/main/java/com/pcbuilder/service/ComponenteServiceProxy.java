@@ -1,4 +1,4 @@
-package com.pcbuilder.model;
+package com.pcbuilder.service;
 
 import com.pcbuilder.model.Componente;
 import com.pcbuilder.repository.ComponenteRepository;

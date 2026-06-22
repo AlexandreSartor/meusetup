@@ -31,6 +31,7 @@ interface Component {
   id: string
   name: string
   price: number
+  tipo?: string | any; //
   specs: string[]
   brand: string
   imagemURL?: string;
@@ -689,29 +690,11 @@ function BuilderScreen({
 
   // Agrupar componentes por tipo de forma flexível e segura (ignora maiúsculas/minúsculas)
   const componentsByType = {
-    cpu: components.filter(c => 
-      c.brand.toUpperCase() === 'AMD' || 
-      c.brand.toUpperCase() === 'INTEL' || 
-      c.id.toLowerCase().includes('cpu')
-    ),
-    motherboard: components.filter(c => 
-      ['ASUS', 'GIGABYTE', 'MSI', 'ASROCK'].includes(c.brand.toUpperCase()) || 
-      c.id.toLowerCase().includes('mb') || 
-      c.id.toLowerCase().includes('motherboard')
-    ),
-    ram: components.filter(c => 
-      ['CORSAIR', 'KINGSTON', 'G.SKILL', 'CRUCIAL', 'TEAM', 'XPG', 'ASGARD'].includes(c.brand.toUpperCase()) || 
-      c.id.toLowerCase().includes('ram')
-    ),
-    gpu: components.filter(c => 
-      c.brand.toUpperCase() === 'NVIDIA' || 
-      c.brand.toUpperCase() === 'AMD' || 
-      c.id.toLowerCase().includes('gpu')
-    ),
-    psu: components.filter(c => 
-      ['CORSAIR', 'EVGA', 'COOLER MASTER', 'SEASONIC', 'XPG', 'FONTE'].includes(c.brand.toUpperCase()) || 
-      c.id.toLowerCase().includes('psu')
-    )
+    cpu: components.filter(c => c.tipo === 'CPU'),
+    motherboard: components.filter(c => c.tipo === 'MOTHERBOARD'),
+    ram: components.filter(c => c.tipo === 'RAM'),
+    gpu: components.filter(c => c.tipo === 'GPU'),
+    psu: components.filter(c => c.tipo === 'PSU')
   }
 
   // Criar steps dinamicamente com componentes do backend
@@ -897,13 +880,14 @@ export default function PCBuilder() {
         
         // Converter para formato do frontend
         const frontendComponents: Component[] = backendComponents.map(comp => ({
-          id: comp.id.toString(),
-          name: comp.nome,
-          price: comp.preco,
-          brand: comp.marca,
-          imagemURL: comp.imagemURL,
-          specs: comp.especificacoes || []
-        }))
+        id: comp.id.toString(),
+        name: comp.nome,
+        price: comp.preco,
+        brand: comp.marca,
+        tipo: comp.tipo.toUpperCase(), // <-- Adicionado para garantir a filtragem
+        imagemURL: comp.imagemURL,
+        specs: comp.especificacoes || []
+      }))
         
         setComponents(frontendComponents)
       } catch (err) {

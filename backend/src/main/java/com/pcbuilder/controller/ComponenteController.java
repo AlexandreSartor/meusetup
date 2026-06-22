@@ -2,7 +2,7 @@ package com.pcbuilder.controller;
 
 import com.pcbuilder.model.Componente;
 import com.pcbuilder.repository.ComponenteRepository;
-import com.pcbuilder.model.ComponenteServiceProxy;
+import com.pcbuilder.service.ComponenteServiceProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
