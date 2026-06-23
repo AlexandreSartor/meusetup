@@ -4,7 +4,7 @@ export interface Component {
   id: string
   name: string
   price: number
-  tipo: "RAM"
+  tipo?: string;
   specs: string[]
   brand: string
 }
